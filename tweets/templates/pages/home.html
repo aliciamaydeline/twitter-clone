@@ -2,4 +2,51 @@
 
 {% block content %}
 Welcome to Twitter-Clone
+
+<div id='tweets'>
+  Loading ...
+</div>
+
+<script>
+  const tweetsElement = document.getElementById("tweets")
+
+  const xhr = new XMLHttpRequest()
+  const method = 'GET'
+  const url = "/tweets"
+  const responseType = "json"
+
+  function likeBtn(tweet) {
+    return "<button class='btn btn-primary btn-small' onclick=handleLike(" + 
+      tweet.id + "," + tweet.likes + ")>" + tweet.likes + " Like</button>"
+  }
+
+  function handleLike(tweet_id, count) {
+    count++
+    return count
+  }
+
+  function formatTweetElem(tweet) {
+    var formattedTweet = "<div class='mb-4 tweet' id='tweet-" + tweet.id + "'>" + tweet.id 
+      + "<p>" + tweet.content + "</p><div class='btn-group'>" + likeBtn(tweet) + "</div></div>" 
+    return formattedTweet
+  }
+  
+  xhr.responseType = responseType
+  xhr.open(method, url)
+  xhr.onload = function() {
+    const serverResponse = xhr.response
+    var listedItems = serverResponse.response
+    var finalTweetStr = ""
+    var i
+
+    for (i = 0; i < listedItems.length; i++) {
+      finalTweetStr += formatTweetElem(listedItems[i])
+    }
+
+    tweetsElement.innerHTML = finalTweetStr
+  }
+  xhr.send()
+  
+</script>
+
 {% endblock content %}
