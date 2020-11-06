@@ -12,7 +12,7 @@
   <div class='col-md-4 mx-auto col-10'>
     <form class='form' id='tweet-create-form' method='POST' action='/create-tweet'> {% csrf_token %}
       <input type='hidden' value='/' name='next' />
-      <textarea class='form-control' name='content' placeholder='TweetTweet here ..'></textarea>
+      <textarea required='required' class='form-control' name='content' placeholder='TweetTweet here ..'></textarea>
       <button type='submit' class='btn btn-primary'>TweetTweet</button>
     </form>
   </div>
@@ -39,10 +39,19 @@
     xhr.onload = function() {
       if (xhr.status === 201) {
         const newTweet = xhr.response
-        const newTweetJson = JSON.parse(newTweet)
-        const newTweetElem = formatTweetElem(newTweetJson)
-        console.log(newTweetElem)
+        const newTweetElem = formatTweetElem(newTweet)
+        
+        const currHtml = tweetContainerElem.innerHTML
+        tweetContainerElem.innerHTML = newTweetElem + currHtml
+        form.reset()
+      } else if (xhr.status === 400) {
+        const errorJson = xhr.response
+        console.log(errorJson)
+        alert("TweetTweet too long. Max 240 chars.")
       }
+    }
+    xhr.onerror = function() {
+      alert("An error has occured. Try again later.")
     }
     xhr.send(formData)
   }
@@ -50,7 +59,7 @@
   const tweetCreateFormEl = document.getElementById("tweet-create-form")
   tweetCreateFormEl.addEventListener("submit", tweetCreateFormDidSubmit)
 
-  const currTweetElem = document.getElementById("tweets")
+  const tweetContainerElem = document.getElementById("tweets")
 
   function loadTweets(tweetsElement) {
     const xhr = new XMLHttpRequest()
@@ -75,7 +84,7 @@
     xhr.send()
   }
 
-  loadTweets(currTweetElem)
+  loadTweets(tweetContainerElem)
 
   function likeBtn(tweet) {
     return "<button class='btn btn-primary btn-small' onclick=handleLike(" + 
