@@ -11,6 +11,7 @@
 <div class='row mb-3'>
   <div class='col-md-4 mx-auto col-10'>
     <form class='form' id='tweet-create-form' method='POST' action='/create-tweet'> {% csrf_token %}
+      <div class='d-none alert alert-danger' id='tweet-create-form-error'></div>
       <input type='hidden' value='/' name='next' />
       <textarea required='required' class='form-control' name='content' placeholder='TweetTweet here ..'></textarea>
       <button type='submit' class='btn btn-primary'>TweetTweet</button>
@@ -23,6 +24,19 @@
 </div>
 
 <script>
+
+  function tweetCreateFormError(msg, display) {
+    var errorDiv = document.getElementById("tweet-create-form-error")
+    if (display === true) {
+      // show error
+      errorDiv.setAttribute("class", "d-block alert alert-danger")
+      errorDiv.innerText = msg
+    } else {
+      // hide error
+      errorDiv.setAttribute("class", "d-none alert alert-danger")
+    }
+  }
+
   function tweetCreateFormDidSubmit(event) {
     event.preventDefault()
     const form = event.target
@@ -38,20 +52,33 @@
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
     xhr.onload = function() {
       if (xhr.status === 201) {
+        tweetCreateFormError("", false)
         const newTweet = xhr.response
         const newTweetElem = formatTweetElem(newTweet)
         
         const currHtml = tweetContainerElem.innerHTML
         tweetContainerElem.innerHTML = newTweetElem + currHtml
         form.reset()
+
       } else if (xhr.status === 400) {
         const errorJson = xhr.response
-        console.log(errorJson)
-        alert("TweetTweet too long. Max 240 chars.")
+        const contentError = errorJson.content
+        let contentErrorMsg
+        if (contentError) {
+          contentErrorMsg = contentError[0]
+          if (contentErrorMsg) {
+            tweetCreateFormError(contentErrorMsg, true)
+          }
+        } else {
+          alert("An error has occured. Please try again.")
+        }
+
+      } else if (xhr.status === 500) {  // server error
+        alert("There was a server error. Please try again.")
       }
     }
     xhr.onerror = function() {
-      alert("An error has occured. Try again later.")
+      alert("An error has occured. Please try again.")
     }
     xhr.send(formData)
   }
