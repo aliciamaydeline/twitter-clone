@@ -72,8 +72,9 @@
         } else {
           alert("An error has occured. Please try again.")
         }
-      } else if (xhr.status === 401) {  // user unauthorized
+      } else if (xhr.status === 403) {  // user unauthorized
         alert("User not logged in. Log in and try again.")
+        window.location.href = "/login" // redirect to login page
 
       } else if (xhr.status === 500) {  // server error
         alert("There was a server error. Please try again.")
@@ -100,7 +101,7 @@
     xhr.open(method, url)
     xhr.onload = function() {
       const serverResponse = xhr.response
-      var listedItems = serverResponse.response
+      var listedItems = serverResponse
       var finalTweetStr = ""
       var i
 
