@@ -72,6 +72,8 @@
         } else {
           alert("An error has occured. Please try again.")
         }
+      } else if (xhr.status === 401) {  // user unauthorized
+        alert("User not logged in. Log in and try again.")
 
       } else if (xhr.status === 500) {  // server error
         alert("There was a server error. Please try again.")
