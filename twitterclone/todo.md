@@ -16,6 +16,8 @@
     - Image
   - Delete
   - Retweeting
+    - Create only serializer
+    - Read only serializer
   - Liking / unliking
 
 3. Following/Followers
